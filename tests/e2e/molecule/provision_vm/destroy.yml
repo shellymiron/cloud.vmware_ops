@@ -7,14 +7,11 @@
       ansible.builtin.include_vars:
         file: ../vault_files/vsphere_creds.yml
 
-    - name: Include deprovision VM vars
+    - name: Include VM vars
       ansible.builtin.include_vars:
-        file: vars/deprovision_vm_vars.yml
+        file: vars/vars.yml
 
-    - name: Deprovision a VM
-      ansible.builtin.import_role:
-        name: provision_vm
-
-    - name: Verify that VM is absent
+    - name: Deprovision VM and run checks
+      loop: "{{ provision_vms }}"
       ansible.builtin.include_tasks:
-        file: post_validations/verify_vm_deprovisioning.yml
+        file: tasks/deprovision_vm.yml
