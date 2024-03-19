@@ -1,0 +1,22 @@
+- name: Basic Security Scenario
+  block:
+    - name: Import vars
+      ansible.builtin.include_vars:
+        file: ../vars/vars.yml
+
+    - name: debug vars
+      ansible.builtin.debug:
+        msg: "hostname: {{ vCenter_hostname }}"
+
+    - name: Run security role
+      ansible.builtin.import_role:
+        name: security
+      vars:
+        security_hostname: "{{ vCenter_hostname }}"
+        security_username: "{{ vCenter_username }}"
+        security_password: "{{ vCenter_password }}"
+        security_validate_certs: false
+
+    # - name: Verify security role post run
+    #   ansible.builtin.include_tasks:
+    #     file: ../post_validations/verify_security_test.yml

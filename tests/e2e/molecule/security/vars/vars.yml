@@ -1,0 +1,9 @@
+# vars.yaml
+
+mock_file: "security_test"
+security_consolecli_enabled: true
+security_dcui_enabled: true
+security_shell_enabled: true
+security_shell_timeout: 100
+security_ssh_enabled: true
+security_firewall_rules: []
