@@ -1,5 +1,10 @@
 # vars.yaml
 
+security_hostname: "{{ vCenter_hostname }}"
+security_username: "{{ vCenter_username }}"
+security_password: "{{ vCenter_password }}"
+security_validate_certs: false
+
 mock_file: "security_test"
 security_consolecli_enabled: true
 security_dcui_enabled: true
