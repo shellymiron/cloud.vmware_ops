@@ -1,0 +1,24 @@
+# vars.yaml
+system_settings_timesync_mode: "NTP"
+# system_settings_timezone: "2024-03-26T15:30:00Z"
+system_settings_global_fips: false
+system_settings_resize_storage: false
+system_settings_ntp_servers:
+  - "0.pool.ntp.org"
+  - "1.pool.ntp.org"
+  - "2.pool.ntp.org"
+  - "3.pool.ntp.org"
+system_settings_noproxy: [1.2.3.4, "quay.io"]
+system_settings_proxy:
+  - protocol: http
+    enabled: true
+    url: http://localhost
+    port: 1234
+system_settings_dns_mode_append: true
+system_settings_dns_hostname: "eco-vcenter-server.lab.eng.tlv2.redhat.com"
+system_settings_dns_domains:
+  - "example.com"
+  - "example.org"
+system_settings_dns_servers:
+  - "10.47.242.10"
+  - "10.38.5.26"
