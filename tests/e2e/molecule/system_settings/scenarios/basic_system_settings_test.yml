@@ -1,0 +1,18 @@
+- name: Basic System Settings Scenario
+  block:
+    - name: Import vars
+      ansible.builtin.include_vars:
+        file: ../vars/vars.yml
+
+    - name: Run system settings role
+      ansible.builtin.import_role:
+        name: system_settings
+      vars:
+        system_settings_hostname: "{{ vCenter_hostname }}"
+        system_settings_username: "{{ vCenter_username }}"
+        system_settings_password: "{{ vCenter_password }}"
+        system_settings_validate_certs: false
+
+    # - name: Verify security role post run
+    #   ansible.builtin.include_tasks:
+    #     file: ../post_validations/verify_system_settings_test.yml
