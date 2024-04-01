@@ -4,6 +4,10 @@
   ignore_errors: true
 
   tasks:
+    - name: Install VMware Ansible Collections
+      ansible.builtin.command:
+        "ansible-galaxy collection install community.vmware:4.2.0 --force"
+
     - name: Include vSphere datacenter creds
       ansible.builtin.include_vars:
         file: vault_files/vsphere_creds.yml
