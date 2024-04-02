@@ -1,0 +1,37 @@
+---
+- name: Get VCenter security settings
+  environment:
+    VMWARE_HOST: "{{ security_hostname }}"
+    VMWARE_USER: "{{ security_username }}"
+    VMWARE_PASSWORD: "{{ security_password }}"
+    VMWARE_VALIDATE_CERTS: "{{ security_validate_certs }}"
+  block:
+    - name: Get enabled state of BASH
+      vmware.vmware_rest.appliance_access_shell_info:
+      register: shell_state
+
+    - name: Get enabled state of Direct Console User Interface
+      vmware.vmware_rest.appliance_access_dcui_info:
+      register: dcui_state
+
+    - name: Get enabled state of the SSH-based controlled CLI
+      vmware.vmware_rest.appliance_access_ssh_info:
+      register: ssh_state
+
+    - name: Get the list of firewall rules
+      vmware.vmware_rest.appliance_networking_firewall_inbound_info:
+      register: firewall_rules
+
+- name: debug vars
+  ansible.builtin.debug:
+    var: shell_state
+
+- name: Validate security settings for the shell
+  ansible.builtin.assert:
+    that:
+      - dcui_state.value == security_dcui_enabled
+      - shell_state.value.enabled == security_shell_enabled
+      - shell_state.value.timeout > 0
+      - shell_state.value.timeout < security_shell_timeout
+      - ssh_state.value == security_ssh_enabled
+      - firewall_rules.value == security_firewall_rules
