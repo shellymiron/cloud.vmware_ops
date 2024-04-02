@@ -3,9 +3,9 @@
   hosts: localhost
   gather_facts: false
   tasks:
-    - name: Include vSphere datacenter creds
-      ansible.builtin.include_vars:
-        file: ../vault_files/vsphere_creds.yml
+    # - name: Include vSphere datacenter creds
+    #   ansible.builtin.include_vars:
+    #     file: ../vault_files/vsphere_creds.yml
 
     - name: Include VM vars
       ansible.builtin.include_vars:

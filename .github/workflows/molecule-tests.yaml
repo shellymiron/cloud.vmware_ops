@@ -1,0 +1,40 @@
+name: Molecule
+
+on:
+  push:
+    branches:
+      - provision_vm_test
+  pull_request:
+    branches:
+      - provision_vm_test
+
+jobs:
+  molecule:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        scenario:
+          - provision_vm
+    steps:
+      - name: Update pip, git
+        run: |
+          set -euxo pipefail
+          sudo apt-get update
+          sudo apt-get install podman
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          path: .
+      # - name: Run Molecule Tests on vcsim
+      #   run: |
+      #       make e2e
+      #   working-directory: ansible_collections/cloud/vmware_ops
+      - name: Run Molecule Tests on vcsim
+        uses: gofrolist/molecule-action@v2.7.13
+        with:
+          molecule_command: test
+          molecule_args: --scenario-name ${{ matrix.scenario }}
+          molecule_working_dir: tests/e2e
+        env:
+          ANSIBLE_FORCE_COLOR: '1'

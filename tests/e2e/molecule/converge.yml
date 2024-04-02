@@ -4,9 +4,17 @@
   ignore_errors: true
 
   tasks:
-    - name: Include vSphere datacenter creds
-      ansible.builtin.include_vars:
-        file: vault_files/vsphere_creds.yml
+    # - name: Include vSphere datacenter creds
+    #   ansible.builtin.include_vars:
+    #     file: vault_files/vsphere_creds.yml
+
+    - name: Print requirements.yml
+      ansible.builtin.debug:
+        msg: "{{ lookup('file', 'requirements.yml') }}"
+
+    - name: Vcsim
+      ansible.builtin.include_tasks:
+        name: prepare_soap/main.yml
 
     - name: Run molecule scenarios
       ansible.builtin.find:

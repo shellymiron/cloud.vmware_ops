@@ -1,18 +1,18 @@
 ---
 dependency:
   name: galaxy
-
-driver:
-  name: podman
+  options:
+    requirements-file: ../requirements.yml
 
 platforms:
-  - name: instance
-    image: geerlingguy/docker-ubuntu2004-ansible:latest
-    command: /lib/systemd/systemd
-    privileged: true
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-    ansible_connection: ansible
+  - name: molecule-ubuntu
+    image: ubuntu:18.04
+driver:
+  options:
+    managed: False
+    login_cmd_template: "podman exec -ti {instance} bash"
+    ansible_connection_options:
+      ansible_connection: podman
 
 provisioner:
   name: ansible
@@ -26,11 +26,17 @@ provisioner:
     ANSIBLE_ROLES_PATH: "../../../../roles"
   config_options:
     defaults:
-      vault_password_file: ${HOME}/vault.pass
+      # vault_password_file: ${HOME}/vault.pass
       callback_whitelist: junit
   playbooks:
     converge: ../converge.yml
-    destroy: destroy.yml
+    # destroy: destroy.yml
+
+scenario:
+  test_sequence:
+    - converge
+    - idempotence
+    - verify
 
 verifier:
   name: ansible
