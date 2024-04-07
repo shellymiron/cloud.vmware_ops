@@ -1,0 +1,17 @@
+---
+- name: Deprovision VM
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Include vSphere datacenter creds
+      ansible.builtin.include_vars:
+        file: ../vault_files/vsphere_creds.yml
+
+    - name: Include VM vars
+      ansible.builtin.include_vars:
+        file: vars/vars.yml
+
+    - name: Deprovision VM and run checks
+      loop: "{{ provision_vms + provision_vms_template + provision_vms_from_template }}"
+      ansible.builtin.include_tasks:
+        file: tasks/deprovision_vm.yml
