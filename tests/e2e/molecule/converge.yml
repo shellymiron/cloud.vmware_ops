@@ -4,6 +4,7 @@
   ignore_errors: true
 
   tasks:
+
     - name: Include vSphere datacenter creds
       ansible.builtin.include_vars:
         file: vault_files/vsphere_creds.yml

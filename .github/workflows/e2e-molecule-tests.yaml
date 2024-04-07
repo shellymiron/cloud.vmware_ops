@@ -1,0 +1,35 @@
+name: Molecule
+
+on:
+  push:
+    branches:
+      - provision_vm_test
+  pull_request:
+    branches:
+      - provision_vm_test
+
+jobs:
+  molecule:
+    runs-on: [self-hosted, linux, X64]
+    strategy:
+      fail-fast: false
+      matrix:
+        scenario:
+          - provision_vm
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          path: .
+      - name: Run Molecule E2E Test
+        run: |
+            podman login -u smiron -p ${{ secrets.VAULT_PASS }} quay.io
+            podman run --rm --privileged \
+              -e VAULT_PASS=${{ secrets.VAULT_PASS }} \
+              -w /workspace/tests/e2e \
+              -v $(pwd)/tests/integration:/tmp/integration \
+              -v $(pwd):/workspace \
+              quay.io/smiron/vmware-content-molecule-e2e:latest bash -c \
+              'echo $VAULT_PASS > /tmp/vault.pass; molecule test --scenario-name ${{ matrix.scenario }}'
+        env:
+            ANSIBLE_FORCE_COLOR: '1'

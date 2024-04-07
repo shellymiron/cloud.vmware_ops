@@ -26,13 +26,19 @@ provisioner:
     ansible-lint
   env:
     ANSIBLE_ROLES_PATH: "../../../../roles"
+    ANSIBLE_VERBOSITY: 3
   config_options:
     defaults:
-      vault_password_file: ${HOME}/vault.pass
+      vault_password_file: /tmp/vault.pass
       callback_whitelist: junit
   playbooks:
     converge: ../converge.yml
     destroy: destroy.yml
+scenario:
+    test_sequence:
+      - destroy
+      - converge
+      - destroy
 
 verifier:
   name: ansible
