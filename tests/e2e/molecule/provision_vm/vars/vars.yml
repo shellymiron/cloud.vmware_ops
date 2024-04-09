@@ -2,8 +2,8 @@
 provision_vm_hostname: "{{ vCenter_hostname }}"
 provision_vm_username: "{{ vCenter_username }}"
 provision_vm_password: "{{ vCenter_password }}"
-
 provision_vm_validate_certs: false
+
 provision_vm_cluster: "nestedcluster"
 provision_vm_folder: "/nesteddatacenter/vm"
 provision_vm_datacenter: "nesteddatacenter"
@@ -41,7 +41,7 @@ provision_vms_from_template:
   - provision_vm_name: "qe-provision-vm-from-template"
     provision_vm_state: "poweredon"
     provision_vm_template: "{{ provision_vms_template[0].provision_vm_name }}"
-    provision_vm_datastore: "Datastore-host2"
+    provision_vm_datastore: "Datastore-host1"
 
 provision_vms:
 # RHEL9 VM
@@ -110,3 +110,63 @@ provision_vms:
       secure_boot: true
     provision_vm_guest_id: "rhel8_64Guest"
     provision_vm_datastore: "Datastore-host1"
+
+vm_to_update: "{{ provision_vms[0] }}"
+vm_update_name: "{{ vm_to_update.provision_vm_name }}"
+vm_update_datastore: "{{ vm_to_update.provision_vm_datastore }}"
+
+vm_names_to_update:
+  - vm_updated_name
+  - "{{ vm_update_name }}"
+
+vm_states:
+#  - "rebootguest" # error msg: "VMware tools should be installed for guest shutdown/reboot"
+#  - "shutdownguest" # error msg: "VMware tools should be installed for guest shutdown/reboot"
+#  - "restarted" # test failing because after restart the status is poweredOn again
+  - "suspended"
+  - "poweredon"
+  - "poweredoff"
+
+vm_updated_hardware:
+  memory_mb: 2048
+  num_cpus: 6
+  num_cpu_cores_per_socket: 2
+  boot_firmware: efi
+  secure_boot: true
+
+vm_updated_networks:
+  - name: "Network1"
+    device_type: "vmxnet3"
+    mac: "00:50:56:bd:d2:9e"
+    type: "dhcp"
+
+vm_enlarge_disk:
+  - size_gb: "{{ vm_to_update.provision_vm_disk[0].size_gb + 10 }}"
+    type: "{{ vm_to_update.provision_vm_disk[0].type }}"
+    datastore: "{{ vm_to_update.provision_vm_disk[0].datastore }}"
+
+vm_disk_to_add:
+  - size_gb: 10
+    type: thin
+    datastore: "Datastore-host1"
+
+vm_add_disk: "{{ vm_to_update.provision_vm_disk + vm_disk_to_add }}"
+
+guest_fullnames:
+  rhel8_64Guest: "Red Hat Enterprise Linux 8 (64-bit)"
+  rhel9_64Guest: "Red Hat Enterprise Linux 9 (64-bit)"
+
+vm_updated_guest_id: "rhel8_64Guest"
+vm_updated_cdrom:
+  - controller_number: 0
+    unit_number: 0
+    state: present
+    type: iso
+    iso_path: "[Datastore-host1] rhel-8.1-x86_64-boot.iso"
+
+vm_update_os_customization:
+  existing_vm: true
+  hostname: my.customized.vm
+  timezone: Europe/Paris
+
+gib_to_bytes: 1073741824

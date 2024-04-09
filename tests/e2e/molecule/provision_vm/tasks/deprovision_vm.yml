@@ -1,4 +1,3 @@
-
 - name: Deprovision VM {{ item.provision_vm_name }}
   ansible.builtin.include_role:
     name: provision_vm
