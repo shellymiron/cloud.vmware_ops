@@ -36,12 +36,25 @@
   ansible.builtin.include_tasks:
     file: provision_vm/tasks/update_vm_state.yml
 
-# - name: Update networks of existing VM {{ vm_update_name }}
-#   ansible.builtin.import_role:
-#     name: provision_vm
-#   vars:
-#     provision_vm_name: "{{ vm_update_name }}"
-#     provision_vm_networks: "{{ vm_updated_networks }}"
+- name: Add Management Network VM Portgroup to all hosts in a cluster
+  community.vmware.vmware_portgroup:
+    hostname: "{{ vCenter_hostname }}"
+    username: "{{ vCenter_username }}"
+    password: "{{ vCenter_password }}"
+    validate_certs: "{{ provision_vm_validate_certs }}"
+    cluster_name: "{{ provision_vm_cluster }}"
+    switch: "{{ vswitch_name }}"
+    portgroup: "{{ portgroup_name }}"
+    security:
+      forged_transmits: true
+      promiscuous_mode: true
+
+- name: Update networks of existing VM {{ vm_update_name }}
+  ansible.builtin.import_role:
+    name: provision_vm
+  vars:
+    provision_vm_name: "{{ vm_update_name }}"
+    provision_vm_networks: "{{ vm_updated_networks }}"
 
 - name: Update VM hardware properties
   ansible.builtin.import_role:
