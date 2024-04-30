@@ -1,0 +1,24 @@
+# Auth
+provision_virtual_esxi_hostname: "{{ vcenter_hostname }}"
+provision_virtual_esxi_username: "{{ vcenter_username }}"
+provision_virtual_esxi_password: "{{ vcenter_password }}"
+# provision_virtual_esxi_port: "443"
+provision_virtual_esxi_validate_certs: false
+# provision_virtual_esxi_cluster: "Eco-Cluster"
+provision_virtual_esxi_datacenter: "Eco-Datacenter"
+provision_virtual_esxi_folder: ""
+provision_virtual_esxi_vms:
+  - name: esxi-1
+  - name: esxi-2
+    disks:
+      - size_gb: 50
+        type: thin
+        autoselect_datastore: true
+      - size_gb: 50
+        type: thin
+        autoselect_datastore: true
+  - name: esxi-3
+    memory_mb: 2000
+    cpus: 4
+provision_virtual_esxi_iso_path: "[eco-nfs-datastore-iso] esxi_8.iso"
+provision_virtual_esxi_datastore_iso_path: "[eco-nfs-datastore-iso] esxi_8.iso"

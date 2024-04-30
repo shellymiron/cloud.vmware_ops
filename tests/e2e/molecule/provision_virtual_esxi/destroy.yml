@@ -1,0 +1,17 @@
+---
+- name: Deprovision VM
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Include vSphere datacenter creds
+      ansible.builtin.include_vars:
+        file: ../vault_files/eco_vsphere_creds.yml
+
+    - name: Include VM vars
+      ansible.builtin.include_vars:
+        file: vars/vars.yml
+
+    - name: Deprovision ESXis
+      loop: "{{ provision_virtual_esxi_vms }}"
+      ansible.builtin.include_tasks:
+        file: tasks/deprovision_virtual_esxi.yml

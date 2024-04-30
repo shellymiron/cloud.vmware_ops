@@ -1,0 +1,15 @@
+- name: Deprovision Esxi {{ item.name }}
+  ansible.builtin.include_role:
+    name: cloud.vmware_ops.provision_vm
+  vars:
+    provision_vm_hostname: "{{ vcenter_hostname }}"
+    provision_vm_username: "{{ vcenter_username }}"
+    provision_vm_password: "{{ vcenter_password }}"
+    provision_vm_validate_certs: false
+    provision_vm_name: "{{ item.name }}"
+    provision_vm_state: "absent"
+    provision_vm_force: true
+
+- name: "Verify that the following Esxis VM is absent: {{ item.provision_virtual_esxi_vms }}"
+  ansible.builtin.include_tasks:
+    file: post_validations/verify_vm_post_deprovisioning_test.yml

@@ -1,0 +1,23 @@
+# Auth
+provision_vcenter_hostname: "10.46.29.133"
+provision_vcenter_username: "root"
+provision_vcenter_password: "ecoadmin12345!"
+new_vcenter_ip: "10.46.29.175"
+# provision_vcenter_port: "443"
+provision_vcenter_validate_certs: false
+provision_vcenter_iso_mount_point: /Users/smiron/Downloads/vcenter-test
+
+# VCSA VM
+provision_vcenter_iso_path: "/Users/smiron/Downloads/vcenter-test/vcenter-image.iso"
+provision_vcenter_vm_name: "vcenter-test"
+provision_vcenter_vm_network_hostname: "test-nested-vcsa.local"
+provision_vcenter_vm_password: "Ecoadmin12345!"
+provision_vcenter_vm_datastore: datastore5
+provision_vcenter_vm_network_name: "VM Network"
+provision_vcenter_vm_network_mode: static
+provision_vcenter_vm_network_address: "{{ new_vcenter_ip }}"
+provision_vcenter_vm_network_prefix: 25
+provision_vcenter_vm_network_gateway: 10.46.29.254
+provision_vcenter_vm_network_dns:
+  - 10.47.242.10
+  - 10.38.5.26

@@ -1,7 +1,7 @@
 - name: Run all playbooks in the scenarios directory
   hosts: localhost
   gather_facts: true
-  ignore_errors: true
+  ignore_errors: false
 
   tasks:
     - name: Include vSphere datacenter creds
