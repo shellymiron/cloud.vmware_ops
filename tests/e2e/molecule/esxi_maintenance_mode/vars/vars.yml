@@ -1,0 +1,14 @@
+esxi_maintenance_mode_hostname: "{{ vcenter_hostname }}"
+esxi_maintenance_mode_username: "{{ vcenter_username }}"
+esxi_maintenance_mode_password: "{{ vcenter_password }}"
+# esxi_maintenance_mode_port: 443
+esxi_maintenance_mode_validate_certs: false
+
+# put host in maintenance mode
+esxi_maintenance_mode_on:
+  - esxi_maintenance_mode_enable: True
+  - esxi_maintenance_mode_enable: False
+
+esxi_maintenance_mode_esxi_hostname: "10.46.29.135"
+esxi_maintenance_mode_evacuate: true
+esxi_maintenance_mode_timeout: 100

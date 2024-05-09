@@ -1,0 +1,12 @@
+- name: Import vars
+  ansible.builtin.include_vars:
+    file: ../vars/vars.yml
+
+- name: Test esxi maintenance mode role
+  ansible.builtin.include_role:
+    name: cloud.vmware_ops.esxi_maintenance_mode
+  loop: "{{ esxi_maintenance_mode_on }}"
+  loop_control:
+    loop_var: esxi_maintenance_mode_item
+  vars:
+    esxi_maintenance_mode_enable: "{{ esxi_maintenance_mode_item.esxi_maintenance_mode_enable }}"
