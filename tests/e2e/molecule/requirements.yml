@@ -1,0 +1,8 @@
+---
+collections:
+  - name: https://github.com/redhat-cop/cloud.vmware_ops.git
+    type: git
+    version: main
+  - name: https://github.com/ansible-collections/vmware.vmware
+    type: git
+    version: main

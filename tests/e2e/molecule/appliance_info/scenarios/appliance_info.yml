@@ -1,0 +1,7 @@
+- name: Import vars
+  ansible.builtin.include_vars:
+    file: ../vars/vars.yml
+
+- name: Appliance Info Gather
+  ansible.builtin.include_role:
+    name: cloud.vmware_ops.info
