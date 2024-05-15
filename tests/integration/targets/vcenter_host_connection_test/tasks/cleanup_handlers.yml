@@ -1,0 +1,9 @@
+# tasks/cleanup_handlers.yml
+
+- name: Cleanup resources
+  block:
+    - name: Trigger cleanup for failed tasks
+      ansible.builtin.meta: flush_handlers
+
+    - name: Cleanup tasks
+      include_tasks: cleanup_resources.yml

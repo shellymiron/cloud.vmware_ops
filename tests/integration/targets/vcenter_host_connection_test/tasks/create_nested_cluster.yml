@@ -1,0 +1,11 @@
+# tasks/create_nested_cluster.yml
+
+- name: Create Nested Cluster
+  community.vmware.vmware_cluster:
+    hostname: '{{ nested_vcenter_hostname }}'
+    username: '{{ nested_vcenter_username }}'
+    password: '{{ nested_vcenter_password }}'
+    datacenter_name: "{{ nested_datacenter }}"
+    cluster_name: "{{ nested_cluster }}"
+    validate_certs: false
+  tags: [config_nested]

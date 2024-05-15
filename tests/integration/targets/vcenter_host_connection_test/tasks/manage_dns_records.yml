@@ -1,0 +1,22 @@
+# tasks/manage_dns_records.yml
+
+- name: Remove Existing DNS Record for Nested Vcenter
+  become: true
+  ansible.builtin.lineinfile:
+    dest: /etc/hosts
+    regexp: "^.* {{ nested_vcenter_hostname }}$"
+    state: absent
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Add Temporary DNS Record for Nested Vcenter
+  become: true
+  ansible.builtin.lineinfile:
+    dest: /etc/hosts
+    regexp: "^.* {{ nested_vcenter_hostname }}$"
+    line: "{{ _esxi_info.results[0].instance.ipv4 }}  {{ nested_vcenter_hostname }}"
+    state: present
+    owner: root
+    group: root
+    mode: '0644'
