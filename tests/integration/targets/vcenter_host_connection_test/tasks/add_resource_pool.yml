@@ -1,0 +1,12 @@
+# tasks/add_resource_pool.yml
+
+- name: Add Resource Pool
+  community.vmware.vmware_resource_pool:
+    hostname: "{{ vcenter_host_connection_hostname }}"
+    username: "{{ vcenter_host_connection_username }}"
+    password: "{{ vcenter_host_connection_password }}"
+    datacenter: "{{ vcenter_host_connection_datacenter }}"
+    cluster: "{{ vcenter_host_connection_cluster }}"
+    validate_certs: "{{ vcenter_host_connection_validate_certs }}"
+    resource_pool: "{{ resource_pool_name }}"
+    state: present

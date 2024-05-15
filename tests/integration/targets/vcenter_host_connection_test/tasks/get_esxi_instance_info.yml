@@ -1,0 +1,15 @@
+# tasks/get_esxi_instance_info.yml
+
+- name: Get ESXi Instance Info
+  community.vmware.vmware_guest_info:
+    hostname: "{{ vcenter_host_connection_hostname }}"
+    username: "{{ vcenter_host_connection_username }}"
+    password: "{{ vcenter_host_connection_password }}"
+    datacenter: "{{ vcenter_host_connection_datacenter }}"
+    validate_certs: false
+    name: "{{ _esxi_name }}"
+  loop: "{{ provision_virtual_esxi_vms | map(attribute='name') }}"
+  loop_control:
+    loop_var: _esxi_name
+  register: _esxi_info
+  tags: [config_nested, deploy_vc]

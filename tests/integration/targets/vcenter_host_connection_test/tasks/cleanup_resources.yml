@@ -1,0 +1,54 @@
+# tasks/cleanup_resources.yml
+
+- name: Remove Nested VCenter
+  community.vmware.vmware_guest:
+    hostname: "{{ vcenter_host_connection_hostname }}"
+    username: "{{ vcenter_host_connection_username }}"
+    password: "{{ vcenter_host_connection_password }}"
+    validate_certs: false
+    datacenter: "{{ vcenter_host_connection_datacenter }}"
+    name: "{{ resource_prefix }}-nested-vcsa"
+    state: absent
+
+- name: Disconnect ESXI Host From Cluster
+  ansible.builtin.import_role:
+    name: cloud.vmware_ops.vcenter_host_connection
+  loop: "{{ _esxi_info.results | map(attribute='instance') | map(attribute='ipv4') }}"
+  vars:
+    vcenter_host_connection_state: absent
+    vcenter_host_connection_esxi_hostname: "{{ item }}"
+
+- name: Remove ESXi Hosts
+  community.vmware.vmware_guest:
+    hostname: "{{ vcenter_host_connection_hostname }}"
+    username: "{{ vcenter_host_connection_username }}"
+    password: "{{ vcenter_host_connection_password }}"
+    validate_certs: false
+    datacenter: "{{ vcenter_host_connection_datacenter }}"
+    name: "{{ item.name }}"
+    state: absent
+  loop: "{{ provision_virtual_esxi_vms }}"
+  loop_control:
+    loop_var: item
+
+- name: Remove Resource Pool
+  community.vmware.vmware_resource_pool:
+    hostname: "{{ vcenter_host_connection_hostname }}"
+    username: "{{ vcenter_host_connection_username }}"
+    password: "{{ vcenter_host_connection_password }}"
+    validate_certs: false
+    datacenter: "{{ vcenter_host_connection_datacenter }}"
+    cluster: "{{ vcenter_host_connection_cluster }}"
+    resource_pool: "{{ resource_pool_name }}"
+    state: absent
+
+- name: Remove VM Network Portgroup
+  community.vmware.vmware_portgroup:
+    hostname: "{{ vcenter_host_connection_hostname }}"
+    username: "{{ vcenter_host_connection_username }}"
+    password: "{{ vcenter_host_connection_password }}"
+    validate_certs: false
+    cluster: "{{ vcenter_host_connection_cluster }}"
+    switch: vSwitch0
+    portgroup: "{{ network_name }}"
+    state: absent

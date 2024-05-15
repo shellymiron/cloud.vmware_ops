@@ -1,0 +1,26 @@
+# tasks/deploy_nested_vcenter.yml
+
+- name: Deploy Nested VCenter
+  ansible.builtin.import_role:
+    name: cloud.vmware_ops.provision_vcenter
+  tags: [deploy_vc]
+  vars:
+    provision_vcenter_hostname: "{{ _esxi_info.results[0].instance.ipv4 }}"
+    provision_vcenter_username: root
+    provision_vcenter_password: "{{ esxi_root_password }}"
+    provision_vcenter_validate_certs: false
+    provision_vcenter_vm_name: "{{ resource_prefix }}-nested-vcsa"
+    provision_vcenter_vm_network_hostname: "{{ nested_vcenter_hostname }}"
+    provision_vcenter_iso_path: "{{ nested_vcenter_iso_path }}"
+    provision_vcenter_vm_network_mode: dhcp
+    # ***** to check *****
+    # provision_vcenter_vm_network_mode: static
+    # provision_vcenter_vm_network_address: "10.46.29.161"
+    # provision_vcenter_vm_network_prefix: "24"
+    # provision_vcenter_vm_network_gateway: "10.46.29.254"
+    # provision_vcenter_vm_network_dns: "10.47.242.10"
+    # provision_vcenter_vm_network_ip_family: ipv4
+    # ***** to check *****
+    provision_vcenter_vm_network_name: "VM Network"
+    provision_vcenter_vm_datastore: datastore1
+    provision_vcenter_vm_password: "{{ esxi_root_password }}"

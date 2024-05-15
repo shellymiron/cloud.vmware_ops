@@ -1,0 +1,11 @@
+# tasks/create_nested_datacenter.yml
+
+- name: Create Nested Datacenter
+  community.vmware.vmware_datacenter:
+    hostname: '{{ nested_vcenter_hostname }}'
+    username: '{{ nested_vcenter_username }}'
+    password: '{{ nested_vcenter_password }}'
+    datacenter_name: '{{ nested_datacenter }}'
+    validate_certs: false
+    state: present
+  tags: [config_nested]

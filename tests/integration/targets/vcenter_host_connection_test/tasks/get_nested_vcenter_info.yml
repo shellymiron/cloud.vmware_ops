@@ -1,0 +1,12 @@
+# tasks/get_nested_vcenter_info.yml
+
+- name: Get Nested VCenter Info
+  community.vmware.vmware_guest_info:
+    hostname: "{{ _esxi_info.results[0].instance.ipv4 }}"
+    username: root
+    password: "{{ esxi_root_password }}"
+    validate_certs: "{{ vcenter_validate_certs }}"
+    datacenter: ""
+    name: "{{ resource_prefix }}-nested-vcsa"
+  register: _nested_vcsa_info
+  tags: [deploy_vc]
