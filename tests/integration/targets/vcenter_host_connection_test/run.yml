@@ -1,17 +1,13 @@
-- hosts: localhost
-  gather_facts: no
-  collections:
-    - community.general
+- name: Run vcenter host connect test
+  hosts: localhost
+  gather_facts: false
 
   tasks:
-    - name: Vcsim
-      ansible.builtin.import_role:
-        name: prepare_soap
+    - name: Run Test Tasks
+      ansible.builtin.include_tasks: tasks/main.yml
+      register: all_operations_result
 
-    - name: ESXi
-      ansible.builtin.import_role:
-        name: prepare_esx
-
-    - name: Import vcenter_host_connection_test
-      ansible.builtin.import_role:
-        name: vcenter_host_connection_test
+  handlers:
+    - name: Include cleanup handlers
+      ansible.builtin.include_tasks: tasks/cleanup_handlers.yml
+      when: all_operations_result is failed or all_operations_result is skipped

@@ -1,0 +1,14 @@
+# tasks/add_vm_network_portgroup.yml
+
+- name: Add VM Network Portgroup
+  community.vmware.vmware_portgroup:
+    hostname: "{{ vcenter_host_connection_hostname }}"
+    username: "{{ vcenter_host_connection_username }}"
+    password: "{{ vcenter_host_connection_password }}"
+    cluster: "{{ vcenter_host_connection_cluster }}"
+    validate_certs: "{{ vcenter_host_connection_validate_certs }}"
+    switch: vSwitch0
+    portgroup: "{{ network_name }}"
+    security:
+      forged_transmits: true
+      promiscuous_mode: true

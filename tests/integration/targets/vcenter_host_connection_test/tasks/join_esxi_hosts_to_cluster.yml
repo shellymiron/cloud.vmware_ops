@@ -1,0 +1,9 @@
+# tasks/join_esxi_hosts_to_cluster.yml
+
+- name: Join Other ESXi Hosts To Cluster
+  ansible.builtin.include_role:
+    name: cloud.vmware_ops.vcenter_host_connection
+  loop: "{{ _esxi_info.results | map(attribute='instance') | map(attribute='ipv4') }}"
+  vars:
+    vcenter_host_connection_state: present
+    vcenter_host_connection_esxi_hostname: "{{ item }}"

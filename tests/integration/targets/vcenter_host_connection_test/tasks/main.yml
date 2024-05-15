@@ -1,12 +1,39 @@
----
-- name: Add ESXI Host
-  ansible.builtin.import_role:
-    name: cloud.vmware_ops.vcenter_host_connection
-  vars:
-    vcenter_host_connection_state: present
 
-- name: Remove ESXI Host
+- name: Import integration config variables
+  ansible.builtin.include_vars:
+    file: ../../integration_config.yml
+
+- name: Import vars
+  ansible.builtin.include_vars:
+    file: ../vars/main.yml
+
+- name: Run tasks for adding VM network portgroup
+  ansible.builtin.include_tasks: tasks/add_vm_network_portgroup.yml
+
+- name: Run tasks for adding resource pool
+  ansible.builtin.include_tasks: tasks/add_resource_pool.yml
+
+- name: Deploy virtual Esxi(s)
   ansible.builtin.import_role:
-    name: cloud.vmware_ops.vcenter_host_connection
-  vars:
-    vcenter_host_connection_state: absent
+    name: cloud.vmware_ops.provision_virtual_esxi
+
+- name: Run tasks for getting ESXi instance info
+  ansible.builtin.include_tasks: tasks/get_esxi_instance_info.yml
+
+- name: Run tasks for managing DNS records
+  ansible.builtin.include_tasks: tasks/manage_dns_records.yml
+
+- name: Run tasks for deploying nested vCenter
+  ansible.builtin.include_tasks: tasks/deploy_nested_vcenter.yml
+
+- name: Include tasks for getting nested vCenter info
+  ansible.builtin.include_tasks: tasks/get_nested_vcenter_info.yml
+
+- name: Include tasks for creating nested datacenter
+  ansible.builtin.include_tasks: tasks/create_nested_datacenter.yml
+
+- name: Include tasks for creating nested cluster
+  ansible.builtin.include_tasks: tasks/create_nested_cluster.yml
+
+- name: Include tasks for joining ESXi hosts to cluster
+  ansible.builtin.include_tasks: tasks/join_esxi_hosts_to_cluster.yml
