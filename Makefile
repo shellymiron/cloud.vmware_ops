@@ -13,6 +13,10 @@ install-ansible-collections:
 integration: install-python-packages install-ansible-collections
 	ansible-test integration --no-temp-workdir
 
+.PHONY: eco-vcenter-ci
+eco-vcenter-ci: install-python-packages install-ansible-collections
+	ansible-test integration --no-temp-workdir --start-at info_test
+
 .PHONY: ee-clean
 ee-clean:
 	rm -rf context/
