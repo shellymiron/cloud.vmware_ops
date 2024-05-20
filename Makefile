@@ -7,11 +7,15 @@ install-python-packages:
 
 .PHONY: install-ansible-collections
 install-ansible-collections:
-	ansible-galaxy collection install -r tests/integration/requirements.yml
+	ansible-galaxy collection install -r tests/integration/requirements.yml --force
 
 .PHONY: integration
 integration: install-python-packages install-ansible-collections
 	ansible-test integration --no-temp-workdir
+
+.PHONY: eco-vcenter-ci
+eco-vcenter-ci: install-python-packages install-ansible-collections
+	ansible-test integration --no-temp-workdir info_test
 
 .PHONY: ee-clean
 ee-clean:

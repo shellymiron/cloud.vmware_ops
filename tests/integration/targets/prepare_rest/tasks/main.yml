@@ -4,6 +4,7 @@
     name:
       - requests
       - aiohttp
+      - git+https://github.com/vmware/vsphere-automation-sdk-python.git
 
 - name: Run rest
   containers.podman.podman_container:

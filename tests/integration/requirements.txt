@@ -3,3 +3,4 @@ pyVmomi>=6.7
 podman
 requests
 pycdlib
+git+https://github.com/vmware/vsphere-automation-sdk-python.git

@@ -3,3 +3,6 @@ collections:
   - name: vmware.vmware_rest
   - name: vmware.vmware
   - name: containers.podman
+  - name: https://github.com/redhat-cop/cloud.vmware_ops.git
+    type: git
+    version: main
