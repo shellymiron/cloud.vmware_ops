@@ -12,14 +12,21 @@ jobs:
     runs-on: ["self-hosted", linux, X64]
     if: ${{ github.event.issue.pull_request && github.event.comment.body == '/run-integration-on-vcenter'}}
     steps:
+      - name: Extract pull request details
+        id: extract_pr_details
+        run: |
+          pr_url="https://api.github.com/repos/shellymiron/cloud.vmware_ops/pulls/23"
+          pr_details=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "$pr_url")
+          pr_commit_sha=$(echo "$pr_details" | jq -r '.head.sha')
+          echo "PR_COMMIT_SHA=$pr_commit_sha" >> $GITHUB_ENV
+
       - name: Create Check Run
         id: create_check_run
         run: |
-          # Extract necessary information
           repo=$(echo "$GITHUB_REPOSITORY" | cut -d '/' -f 2)
-          pr_number=$(echo "${{ github.event.issue.url }}" | rev | cut -d'/' -f 1 | rev)
+          pr_commit_sha="$PR_COMMIT_SHA"  # Use the extracted commit SHA
           repo_owner=$(echo "$GITHUB_REPOSITORY" | cut -d '/' -f 1)
-      
+
           # Create check run using GitHub API
           response=$(curl -s -X POST \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
@@ -27,7 +34,7 @@ jobs:
             "https://api.github.com/repos/$repo_owner/$repo/check-runs" \
             -d '{
               "name": "Ansible Eco vCenter Integration Test",
-              "head_sha": "'"$pr_number"'",
+              "head_sha": "'"$pr_commit_sha"'",
               "status": "queued",
               "started_at": "'"$(date -u +"%FT%TZ")"'",
               "output": {
@@ -36,6 +43,7 @@ jobs:
                 "text": "The integration test has been triggered. Check back later for the results."
               }
             }')
+
       
           # Check if the response contains any errors
           if [[ $? -ne 0 ]]; then
