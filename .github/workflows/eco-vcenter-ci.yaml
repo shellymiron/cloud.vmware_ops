@@ -18,7 +18,8 @@ jobs:
           pr_url="${{ github.event.issue.url }}"
           pr_details=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "$pr_url")
           pr_commit_sha=$(echo "$pr_details" | jq -r '.head.sha')
-          echo "PR_COMMIT_SHA=$pr_commit_sha" >> $GITHUB_ENV
+          echo "PR_DETAILS: $pr_details"
+          echo "PR_COMMIT_SHA: $pr_commit_sha" >> $GITHUB_ENV
 
       - name: Create Check Run
         id: create_check_run
@@ -56,7 +57,7 @@ jobs:
           
           # Extract check run ID
           check_run_id=$(echo "$response" | jq -r '.id')
-          echo "CHECK_RUN_ID=$check_run_id" >> $GITHUB_ENV
+          echo "CHECK_RUN_ID: $check_run_id" >> $GITHUB_ENV
 
       - name: print something
         run: |
