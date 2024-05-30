@@ -29,8 +29,8 @@ jobs:
         working-directory: ansible_collections/cloud/vmware_ops/scripts
         run: |
             echo "VCENTER_HOSTNAME is: $VCENTER_HOSTNAME"
-            chmod +x generate_integration_config.sh
-            ./generate_integration_config.sh
+            # chmod +x generate_integration_config.sh
+            # ./generate_integration_config.sh
         env:
           VCENTER_HOSTNAME: ${{ secrets.VCENTER_HOSTNAME }}
           VCENTER_USERNAME: ${{ secrets.VCENTER_USERNAME }}
