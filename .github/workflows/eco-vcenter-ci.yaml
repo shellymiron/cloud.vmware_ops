@@ -4,19 +4,6 @@ on:
   workflow_dispatch:
   issue_comment:
     types: [created]
-  pull_request:
-    branches:
-      - '**'
-  push:
-    branches:
-      - '**'
-
-permissions:
-  contents: read
-  issues: write
-  pull-requests: write
-  checks: write
-
 jobs:
   ansible_integration_test:
     runs-on: ["self-hosted", linux, X64]
