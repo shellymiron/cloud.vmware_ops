@@ -1,5 +1,6 @@
 ---
 name: Ansible Eco vCenter Integration Test
+
 on:
   workflow_dispatch:
   issue_comment:
@@ -17,16 +18,17 @@ jobs:
         run: |
           pr_url="${{ github.event.issue.url }}"
           pr_details=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "$pr_url")
-          pr_commit_sha=$(echo "$pr_details" | jq -r '.head.sha')
-          echo "PR_DETAILS: $pr_details"
+          pr_commit_sha=$(echo "$pr_details" | jq -r '.pull_request.head.sha')
           echo "PR_COMMIT_SHA=$pr_commit_sha" >> $GITHUB_ENV
+          echo "PR_DETAILS: $pr_details"
+          echo "PR_COMMIT_SHA: $pr_commit_sha"
 
       - name: Create Check Run
         id: create_check_run
         run: |
           repo=$(echo "$GITHUB_REPOSITORY" | cut -d '/' -f 2)
-          pr_commit_sha="$PR_COMMIT_SHA"  # Use the extracted commit SHA
           repo_owner=$(echo "$GITHUB_REPOSITORY" | cut -d '/' -f 1)
+          pr_commit_sha="$PR_COMMIT_SHA"
       
           # Create check run using GitHub API
           response=$(curl -s -X POST \
@@ -45,7 +47,6 @@ jobs:
               }
             }')
 
-      
           # Check if the response contains any errors
           if [[ $? -ne 0 ]]; then
             echo "Error: Failed to create check run"
@@ -57,7 +58,7 @@ jobs:
           
           # Extract check run ID
           check_run_id=$(echo "$response" | jq -r '.id')
-          echo "CHECK_RUN_ID: $check_run_id" >> $GITHUB_ENV
+          echo "CHECK_RUN_ID=$check_run_id" >> $GITHUB_ENV
 
       - name: print something
         run: |
@@ -66,6 +67,10 @@ jobs:
       - name: Update Check Run Status
         if: always()
         run: |
+          repo=$(echo "$GITHUB_REPOSITORY" | cut -d '/' -f 2)
+          repo_owner=$(echo "$GITHUB_REPOSITORY" | cut -d '/' -f 1)
+          check_run_id="$CHECK_RUN_ID"
+      
           # Complete the check run using GitHub API
           curl -s -X PATCH \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
