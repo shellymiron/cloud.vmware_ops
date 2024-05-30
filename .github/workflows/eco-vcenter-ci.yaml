@@ -20,7 +20,7 @@ jobs:
           repo=$(echo "$GITHUB_REPOSITORY" | cut -d '/' -f 2)
           pr_number=$(echo "${{ github.event.issue.url }}" | rev | cut -d'/' -f 1 | rev)
           repo_owner=$(echo "$GITHUB_REPOSITORY" | cut -d '/' -f 1)
-
+      
           # Create check run using GitHub API
           response=$(curl -s -X POST \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
@@ -28,7 +28,7 @@ jobs:
             "https://api.github.com/repos/$repo_owner/$repo/check-runs" \
             -d '{
               "name": "Ansible Eco vCenter Integration Test",
-              "head_sha": "${{ github.event.issue.pull_request.head.sha }}",
+              "head_sha": "'"$pr_number"'",
               "status": "queued",
               "started_at": "'"$(date -u +"%FT%TZ")"'",
               "output": {
@@ -37,10 +37,10 @@ jobs:
                 "text": "The integration test has been triggered. Check back later for the results."
               }
             }')
-
+      
           # Extract check run ID
           check_run_id=$(echo "$response" | jq -r '.id')
-          echo "::set-output name=check_run_id::$check_run_id"
+          echo "CHECK_RUN_ID=$check_run_id" >> $GITHUB_ENV
 
       - name: Update pip, git
         if: runner.os == 'Linux' && startsWith(runner.name, 'ubuntu')
