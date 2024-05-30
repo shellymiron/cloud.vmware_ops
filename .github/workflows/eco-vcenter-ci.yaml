@@ -5,7 +5,7 @@ on:
   issue_comment:
     types: [created]
 
-permissions: write-all
+permissions: write
 
 jobs:
   ansible_integration_test:
@@ -15,7 +15,7 @@ jobs:
       - name: Extract pull request details
         id: extract_pr_details
         run: |
-          pr_url="https://api.github.com/repos/shellymiron/cloud.vmware_ops/pulls/23"
+          pr_url="${{ github.event.issue.url }}"
           pr_details=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "$pr_url")
           pr_commit_sha=$(echo "$pr_details" | jq -r '.head.sha')
           echo "PR_COMMIT_SHA=$pr_commit_sha" >> $GITHUB_ENV
@@ -24,7 +24,7 @@ jobs:
         id: create_check_run
         run: |
           repo=$(echo "$GITHUB_REPOSITORY" | cut -d '/' -f 2)
-          pr_commit_sha="$PR_COMMIT_SHA"  # Use the extracted commit SHA
+          pr_commit_sha="$PR_COMMIT_SHA"
           repo_owner=$(echo "$GITHUB_REPOSITORY" | cut -d '/' -f 1)
 
           # Create check run using GitHub API
@@ -44,53 +44,13 @@ jobs:
               }
             }')
 
-      
-          # Check if the response contains any errors
-          if [[ $? -ne 0 ]]; then
-            echo "Error: Failed to create check run"
-            exit 1
-          fi
-      
-          # Print the response for debugging
-          echo "Check run creation response: $response"
-          
           # Extract check run ID
           check_run_id=$(echo "$response" | jq -r '.id')
           echo "CHECK_RUN_ID=$check_run_id" >> $GITHUB_ENV
 
-      - name: Update pip, git
-        if: runner.os == 'Linux' && startsWith(runner.name, 'ubuntu')
-        run: |
-          set -euxo pipefail
-          sudo apt-get update
-          sudo apt-get install podman
-
-      - name: Checkout repo
-        uses: actions/checkout@v4
-        with:
-          path: ansible_collections/cloud/vmware_ops
-
-      # - name: Generate integration config
-      #   working-directory: ansible_collections/cloud/vmware_ops/scripts
-      #   run: |
-      #       chmod +x generate_integration_config.sh
-      #       ./generate_integration_config.sh
-      #   env:
-      #     VCENTER_HOSTNAME: ${{ secrets.VCENTER_HOSTNAME }}
-      #     VCENTER_USERNAME: ${{ secrets.VCENTER_USERNAME }}
-      #     VCENTER_PASSWORD: ${{ secrets.VCENTER_PASSWORD }}
-
       - name: print something
         run: |
            echo "hello"
-      # - name: Run integration tests
-      #   run: |
-      #     python3 -m venv .venv
-      #     source .venv/bin/activate
-      #     make eco-vcenter-ci
-      #   working-directory: ansible_collections/cloud/vmware_ops
-      #   env:
-      #     ANSIBLE_COLLECTIONS_PATH: "${{ github.workspace }}"
 
       - name: Update Check Run Status
         if: always()
