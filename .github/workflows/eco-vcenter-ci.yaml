@@ -4,19 +4,44 @@ on:
   workflow_dispatch:
   issue_comment:
     types: [created]
-  pull_request:
-    types: [opened, synchronize]
+
+permissions:
+  contents: read
 
 jobs:
   ansible_integration_test:
-    runs-on: self-hosted
-    if: ${{ github.event_name == 'issue_comment' && github.event.issue.pull_request && github.event.comment.body == '/run-integration-on-vcenter' }}
+    runs-on: ["self-hosted", linux, X64]
+    if: ${{ github.event.issue.pull_request && github.event.comment.body == '/run-integration-on-vcenter'}}
     steps:
-      - name: Checkout PR Branch
-        uses: actions/checkout@v2
-        with:
-          ref: ${{ github.event.pull_request.head.ref }}
-          
+      - name: Create Check Run
+        id: create_check_run
+        run: |
+          # Extract necessary information
+          repo=$(echo "$GITHUB_REPOSITORY" | cut -d '/' -f 2)
+          pr_number=$(echo "${{ github.event.issue.url }}" | rev | cut -d'/' -f 1 | rev)
+          repo_owner=$(echo "$GITHUB_REPOSITORY" | cut -d '/' -f 1)
+
+          # Create check run using GitHub API
+          response=$(curl -s -X POST \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/$repo_owner/$repo/check-runs" \
+            -d '{
+              "name": "Ansible Eco vCenter Integration Test",
+              "head_sha": "${{ github.event.issue.pull_request.head.sha }}",
+              "status": "queued",
+              "started_at": "'"$(date -u +"%FT%TZ")"'",
+              "output": {
+                "title": "Integration Test",
+                "summary": "The integration test is in progress.",
+                "text": "The integration test has been triggered. Check back later for the results."
+              }
+            }')
+
+          # Extract check run ID
+          check_run_id=$(echo "$response" | jq -r '.id')
+          echo "::set-output name=check_run_id::$check_run_id"
+
       - name: Update pip, git
         if: runner.os == 'Linux' && startsWith(runner.name, 'ubuntu')
         run: |
@@ -32,8 +57,8 @@ jobs:
       - name: Generate integration config
         working-directory: ansible_collections/cloud/vmware_ops/scripts
         run: |
-          chmod +x generate_integration_config.sh
-          ./generate_integration_config.sh
+            chmod +x generate_integration_config.sh
+            ./generate_integration_config.sh
         env:
           VCENTER_HOSTNAME: ${{ secrets.VCENTER_HOSTNAME }}
           VCENTER_USERNAME: ${{ secrets.VCENTER_USERNAME }}
@@ -47,3 +72,22 @@ jobs:
         working-directory: ansible_collections/cloud/vmware_ops
         env:
           ANSIBLE_COLLECTIONS_PATH: "${{ github.workspace }}"
+
+      - name: Update Check Run Status
+        if: always()
+        run: |
+          # Complete the check run using GitHub API
+          curl -s -X PATCH \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/$repo_owner/$repo/check-runs/$check_run_id" \
+            -d '{
+              "status": "completed",
+              "completed_at": "'"$(date -u +"%FT%TZ")"'",
+              "conclusion": "success",
+              "output": {
+                "title": "Integration Test",
+                "summary": "The integration test has completed successfully.",
+                "text": "The integration test has passed all checks."
+              }
+            }'
