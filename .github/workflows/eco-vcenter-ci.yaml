@@ -10,11 +10,13 @@ on:
   push:
     branches:
       - '**'
+
 permissions:
   contents: read
   issues: write
   pull-requests: write
   checks: write
+
 jobs:
   ansible_integration_test:
     runs-on: ["self-hosted", linux, X64]
@@ -22,6 +24,21 @@ jobs:
          github.event.issue.pull_request && 
          github.event.comment.body == '/run-integration-on-vcenter'}}
     steps:
+      - name: Github API Request
+        id: request
+        uses: octokit/request-action@v2.0.0
+        with:
+          route: ${{ github.event.issue.pull_request.url }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Checkout PR Branch
+        uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ fromJson(steps.request.outputs.data).head.repo.full_name }}
+          ref: ${{ fromJson(steps.request.outputs.data).head.ref }}
+
       - name: Update pip, git
         if: runner.os == 'Linux' && startsWith(runner.name, 'ubuntu')
         run: |
