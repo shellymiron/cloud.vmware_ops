@@ -23,6 +23,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.pull_request.head.sha }}
           path: ansible_collections/cloud/vmware_ops
 
       - name: Generate integration config
