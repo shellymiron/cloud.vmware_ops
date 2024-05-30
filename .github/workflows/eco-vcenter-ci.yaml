@@ -18,7 +18,7 @@ jobs:
         run: |
           pr_url="${{ github.event.issue.url }}"
           pr_details=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "$pr_url")
-          pr_commit_sha=$(echo "$pr_details" | jq -r '.pull_request.head.sha')
+          pr_commit_sha=$(echo "$pr_details" | jq -r '.head.sha')
           echo "PR_COMMIT_SHA=$pr_commit_sha" >> $GITHUB_ENV
           echo "PR_DETAILS: $pr_details"
           echo "PR_COMMIT_SHA: $pr_commit_sha"
