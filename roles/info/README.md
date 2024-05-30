@@ -1,4 +1,4 @@
-# Gather information from vcenter 
+# Gather information from vcenter
 
 A role that gather information from vcenter.
 

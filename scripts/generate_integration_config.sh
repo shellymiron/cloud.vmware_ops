@@ -12,3 +12,4 @@ truncate -s 0 integration_config.yml
 while read -r line; do
     eval 'echo "'"$line"'"' >> integration_config.yml
 done < "integration_config.yml.tpl"
+
