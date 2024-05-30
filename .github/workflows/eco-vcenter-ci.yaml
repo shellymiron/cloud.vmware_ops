@@ -20,7 +20,7 @@ jobs:
           repo=$(echo "$GITHUB_REPOSITORY" | cut -d '/' -f 2)
           pr_number=$(echo "${{ github.event.issue.url }}" | rev | cut -d'/' -f 1 | rev)
           repo_owner=$(echo "$GITHUB_REPOSITORY" | cut -d '/' -f 1)
-      
+  
           # Create check run using GitHub API
           response=$(curl -s -X POST \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
@@ -37,7 +37,6 @@ jobs:
                 "text": "The integration test has been triggered. Check back later for the results."
               }
             }')
-      
           # Extract check run ID
           check_run_id=$(echo "$response" | jq -r '.id')
           echo "CHECK_RUN_ID=$check_run_id" >> $GITHUB_ENV
