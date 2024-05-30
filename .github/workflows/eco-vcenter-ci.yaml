@@ -17,6 +17,7 @@ jobs:
         run: |
           pr_url="${{ github.event.issue.url }}"
           pr_details=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "$pr_url")
+          echo "Pull request details: $pr_details"
           pr_commit_sha=$(echo "$pr_details" | jq -r '.pull_request.head.sha')
           echo "PR_COMMIT_SHA=$pr_commit_sha" >> $GITHUB_ENV
 
@@ -24,7 +25,7 @@ jobs:
         id: create_check_run
         run: |
           repo=$(echo "$GITHUB_REPOSITORY" | cut -d '/' -f 2)
-          pr_commit_sha="$PR_COMMIT_SHA"
+          pr_commit_sha="$PR_COMMIT_SHA"  # Use the extracted commit SHA
           repo_owner=$(echo "$GITHUB_REPOSITORY" | cut -d '/' -f 1)
 
           # Create check run using GitHub API
@@ -44,6 +45,16 @@ jobs:
               }
             }')
 
+      
+          # Check if the response contains any errors
+          if [[ $? -ne 0 ]]; then
+            echo "Error: Failed to create check run"
+            exit 1
+          fi
+      
+          # Print the response for debugging
+          echo "Check run creation response: $response"
+          
           # Extract check run ID
           check_run_id=$(echo "$response" | jq -r '.id')
           echo "CHECK_RUN_ID=$check_run_id" >> $GITHUB_ENV
