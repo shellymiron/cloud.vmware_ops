@@ -1,88 +1,45 @@
 ---
 name: Ansible Eco vCenter Integration Test
-
 on:
-  workflow_dispatch:
-  issue_comment:
-    types: [created]
-
-permissions: write-all
-
+  pull_request_target:
+    types: [opened, synchronize]
+  push:
+    branches:
+      - main
+      - 'release-\d.\d\d'
+permissions:
+  contents: read
 jobs:
   ansible_integration_test:
     runs-on: ["self-hosted", linux, X64]
-    if: ${{ github.event.issue.pull_request && github.event.comment.body == '/run-integration-on-vcenter'}}
     steps:
-      - name: Extract pull request details
-        id: extract_pr_details
+      - name: Update pip, git
+        if: runner.os == 'Linux' && startsWith(runner.name, 'ubuntu')
         run: |
-          pr_url="${{ github.event.issue.url }}"
-          pr_details=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "$pr_url")
-          pr_commit_sha=$(echo "$pr_details" | jq -r '.head.sha')
-          echo "PR_COMMIT_SHA=$pr_commit_sha" >> $GITHUB_ENV
-          echo "PR_DETAILS: $pr_details"
-          echo "PR_COMMIT_SHA: $pr_commit_sha"
+          set -euxo pipefail
+          sudo apt-get update
+          sudo apt-get install podman
 
-      - name: Create Check Run
-        id: create_check_run
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          path: ansible_collections/cloud/vmware_ops
+
+      - name: Generate integration config
+        working-directory: ansible_collections/cloud/vmware_ops/scripts
         run: |
-          repo=$(echo "$GITHUB_REPOSITORY" | cut -d '/' -f 2)
-          repo_owner=$(echo "$GITHUB_REPOSITORY" | cut -d '/' -f 1)
-          pr_commit_sha="$PR_COMMIT_SHA"
-      
-          # Create check run using GitHub API
-          response=$(curl -s -X POST \
-            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            -H "Accept: application/vnd.github.v3+json" \
-            "https://api.github.com/repos/$repo_owner/$repo/check-runs" \
-            -d '{
-              "name": "Ansible Eco vCenter Integration Test",
-              "head_sha": "'"$pr_commit_sha"'",
-              "status": "queued",
-              "started_at": "'"$(date -u +"%FT%TZ")"'",
-              "output": {
-                "title": "Integration Test",
-                "summary": "The integration test is in progress.",
-                "text": "The integration test has been triggered. Check back later for the results."
-              }
-            }')
+            chmod +x generate_integration_config.sh
+            ./generate_integration_config.sh
+        env:
+          VCENTER_HOSTNAME: ${{ secrets.VCENTER_HOSTNAME }}
+          VCENTER_USERNAME: ${{ secrets.VCENTER_USERNAME }}
+          VCENTER_PASSWORD: ${{ secrets.VCENTER_PASSWORD }}
 
-          # Check if the response contains any errors
-          if [[ $? -ne 0 ]]; then
-            echo "Error: Failed to create check run"
-            exit 1
-          fi
-      
-          # Print the response for debugging
-          echo "Check run creation response: $response"
-          
-          # Extract check run ID
-          check_run_id=$(echo "$response" | jq -r '.id')
-          echo "CHECK_RUN_ID=$check_run_id" >> $GITHUB_ENV
-
-      - name: print something
+      - name: Run integration tests
         run: |
-           echo "hello"
-
-      - name: Update Check Run Status
-        if: always()
-        run: |
-          repo=$(echo "$GITHUB_REPOSITORY" | cut -d '/' -f 2)
-          repo_owner=$(echo "$GITHUB_REPOSITORY" | cut -d '/' -f 1)
-          check_run_id="$CHECK_RUN_ID"
-      
-          # Complete the check run using GitHub API
-          curl -s -X PATCH \
-            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            -H "Accept: application/vnd.github.v3+json" \
-            "https://api.github.com/repos/$repo_owner/$repo/check-runs/$check_run_id" \
-            -d '{
-              "status": "completed",
-              "completed_at": "'"$(date -u +"%FT%TZ")"'",
-              "conclusion": "success",
-              "output": {
-                "title": "Integration Test",
-                "summary": "The integration test has completed successfully.",
-                "text": "The integration test has passed all checks."
-              }
-            }'
+          python3 -m venv .venv
+          source .venv/bin/activate
+          make eco-vcenter-ci
+        working-directory: ansible_collections/cloud/vmware_ops
+        env:
+          ANSIBLE_COLLECTIONS_PATH: "${{ github.workspace }}"
