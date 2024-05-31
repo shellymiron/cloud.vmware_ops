@@ -36,6 +36,9 @@ jobs:
           VCENTER_USERNAME: ${{ secrets.VCENTER_USERNAME }}
           VCENTER_PASSWORD: ${{ secrets.VCENTER_PASSWORD }}
 
+      - name: Print secrets (for debugging only)
+        run: echo "VCENTER_HOSTNAME=${{ secrets.VCENTER_HOSTNAME }}"
+        
       - name: Run integration tests
         run: |
           python3 -m venv .venv
