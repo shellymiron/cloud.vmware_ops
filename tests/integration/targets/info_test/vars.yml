@@ -7,4 +7,9 @@ info_validate_certs: false
 
 mock_file: "info_test"
 
-info_cluster: true
+# workaround till simulator fixed
+info_cluster: false
+info_license: true
+info_appliance: false
+info_guest: false
+info_storage: false
