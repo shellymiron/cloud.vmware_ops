@@ -5,7 +5,7 @@ This repository hosts the `cloud.vmware_ops` Ansible Collection.
 The collection includes a variety of Ansible roles and playbooks to help automate the management of VMware.
 
 <!--start requires_ansible-->
-## Ansible version compatibility
+## Ansible version compatibilityf
 
 This collection has been tested against following Ansible versions: **>=2.14.0**.
 
