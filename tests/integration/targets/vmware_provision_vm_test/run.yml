@@ -1,11 +1,9 @@
-- name: Run Info Test Tasks
-  hosts: localhost
-  gather_facts: false
+- hosts: localhost
+  gather_facts: no
   collections:
     - community.general
 
   tasks:
-
     - name: Import eco-vcenter credentials
       ansible.builtin.include_vars:
         file: ../../integration_config.yml
@@ -16,23 +14,14 @@
         file: vars.yml
       tags: integration-ci
 
-    - name: Prepare Rest
-      ansible.builtin.import_role:
-        name: prepare_rest
-      tags: integration-ci
-
-    - name: Prepare Soap (vcsim)
+    - name: Vcsim
       ansible.builtin.import_role:
         name: prepare_soap
       tags: integration-ci
 
-    - name: Import info role
+    - name: Import provision VM role
       ansible.builtin.import_role:
-<<<<<<<< HEAD:tests/integration/targets/vmware_ops_info_test/run.yml
-        name: vmware_ops_info_test
-========
-        name: vmware_info_test
->>>>>>>> eb5f36c (modify provision_vm_test to fit eco CI):tests/integration/targets/vmware_info_test/run.yml
+        name: vmware_provision_vm_test
       tags:
         - eco-vcenter-ci
         - integration-ci
