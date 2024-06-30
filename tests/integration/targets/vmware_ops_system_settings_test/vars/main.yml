@@ -1,0 +1,31 @@
+system_settings_hostname: "{{ vcenter_hostname }}"
+system_settings_username: "{{ vcenter_username }}"
+system_settings_password: "{{ vcenter_password }}"
+system_settings_validate_certs: false
+
+# system_settings_ntp_servers: []
+# system_settings_timezone: UTC
+# system_settings_global_fips: true
+# system_settings_resize_storage: true
+
+# DNS
+# system_settings_dns_mode: dhcp
+# system_settings_dns_domains: [domain.com]
+# system_settings_dns_hostname: vcenter.domain.com
+
+# Proxy
+system_settings_noproxy: [quay.io, 1.2.3.4]
+system_settings_proxy:
+  - protocol: http
+    url: http://localhost
+    enabled: true
+    state: bla
+    port: 3128
+
+# Security
+system_settings_consolecli_enabled: true
+system_settings_dcui_enabled: true
+system_settings_shell_enabled: true
+system_settings_shell_timeout: 100
+system_settings_ssh_enabled: true
+system_settings_firewall_rules: []
